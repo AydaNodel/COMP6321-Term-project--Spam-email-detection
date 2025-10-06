@@ -40,6 +40,12 @@ In this project, we use the public \texttt{Bourique/data\_email\_spam} corpus av
 This project designs a spam detector and compares traditional machine learning methods with advanced transformer-based models. For the proposed model, we implement transfer learning using pre-trained BERT and DistilBERT models from the Hugging Face library. These models are fine-tuned on the spam email dataset by adding a fully connected classification layer on top of the Transformer encoder. In the preprocessing step, each input email is tokenized using the WordPiece tokenizer, truncated or padded to a fixed sequence length, and passed through the encoder to generate contextual embeddings. The hidden representation corresponding to the [CLS] token is then fed into a dense layer with a sigmoid activation for binary spam–ham classification.
 The fine-tuning process uses the AdamW optimizer with early stopping based on validation F1-score. For comparison, the baseline models will be trained on TF–IDF feature representations extracted from the same dataset. Evaluation metrics will include accuracy, precision, recall, and F1-score.
 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{modell.jpg}
+    \caption{ Project Methodology}
+    \label{model}
+\end{figure}
 
 \section{Timeline}
 We will carry out the project in the following steps:

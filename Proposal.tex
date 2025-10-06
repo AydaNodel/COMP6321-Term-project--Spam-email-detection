@@ -1,5 +1,6 @@
+
 \documentclass[12pt]{article}
-\usepackage[a4paper,margin=0.8in]{geometry}
+\usepackage[a4paper,margin=0.7in]{geometry}
 \usepackage{setspace}
 \usepackage{hyperref}
 \usepackage{amsmath}
@@ -7,7 +8,10 @@
 \usepackage{pgfgantt}
 \usepackage{titlesec}
 \bibliographystyle{IEEEtran}
+\usepackage{titlesec}
 
+\titlespacing*{\section}
+{0pt}{*0.8}{*0.65}
 
 \setstretch{1.15}
 \titleformat{\section}{\large\bfseries}{\thesection.}{0.5em}{}
@@ -22,19 +26,19 @@
 
 
 \section{Introduction and Literature Review}
-The problem of spam detection remains highly relevant due to the large number of malicious or unwanted emails sent daily, which pose risks such as phishing, fraud, and information overload. Traditional rule-based filters often fail against evolving spam techniques. Traditional rule-based filters degrade as spammers change wording and structure to evade fixed patterns \cite{banday2009effectiveness,wang2025review}.
+Detection of spam has remained a major challenge due to the large number of unwanted and malicious emails sent every day, which cause threats such as phishing, fraud, and information overload. In addition, traditional rule-based filters are not usually successful against the changing spam methods.\cite{banday2009effectiveness,wang2025review}. Therefore, spam filtering has moved from rules to supervised machine learning with Naive Bayes, Logistic Regression, and Support Vector Machines trained on bag-of-words and TF--IDF \footnote{Term frequency-inverse document frequency} features over time \cite{hassan2022analytics,chavez2020nb}. These models improved accuracy and interpretability but largely ignore word order and semantic context.
 
-Over time, spam filtering has shifted from rules to supervised machine learning with Naive Bayes, Logistic Regression, and Support Vector Machines trained on bag-of-words and TF--IDF features \cite{hassan2022analytics,chavez2020nb}. These models improved accuracy and interpretability but largely ignore word order and semantic context.
+With larger datasets and greater compute, deep learning models such as RNNs and LSTMs preserved sequential dependencies and often outperformed classical methods, though at higher data and computational cost \cite{johnafrica2022lstm,nasreen2024novel}. More recently, Transformer-based architectures, such as BERT \footnote{Bidirectional encoder representations from transformers} and DistilBERT, use self-attention to capture long-range semantic relationships and enable effective transfer learning on relatively small labeled corpora for email security tasks, including spam and phishing detection \cite{tida2022universal,songailaite2023bertphish,asliyuksek2025multimodal}.
 
-With larger datasets and greater compute, deep learning models such as RNNs and LSTMs preserved sequential dependencies and often outperformed classical methods, though at higher data and computational cost \cite{johnafrica2022lstm,nasreen2024novel}. More recently, Transformer-based architectures (e.g., BERT and DistilBERT) use self-attention to capture long-range semantic relationships and enable effective transfer learning on relatively small labeled corpora for email security tasks, including spam and phishing detection \cite{tida2022universal,songailaite2023bertphish,asliyuksek2025multimodal}.
-
-This project aims to develop a spam classification system that compares classical and modern learning models. Naive Bayes and Logistic Regression will serve as baselines, while transfer learning with pre-trained BERT and DistilBERT models will represent the modern approach. By comparing these methods, the project seeks to evaluate how transfer learning improves spam detection in terms of accuracy, precision, recall, and F1-score, contributing to more effective and context-aware email filtering.
+\section{Motivations and Objectives}
+This project aims to implement a spam classification system that compares classical and modern learning models. Naive Bayes and Logistic Regression will serve as baselines, while transfer learning with pre-trained BERT and DistilBERT models will represent the modern approach. By comparing these methods, the project seeks to evaluate how transfer learning improves spam detection in terms of accuracy, precision, recall, and F1-score, contributing to more effective and context-aware email filtering.
 
 \section{Dataset Description}
-In this project, we use the public \texttt{bourigue/data\_email\_spam} corpus available on Hugging Face \cite{huggingface_dataset}, which provides a single split with approximately $ 85.8\text{k}$ emails in CSV format. Each row has the text field \texttt{text\_combined} (subject + body) and a binary \texttt{label} (0 = ham, 1 = spam). We will split the data into 75\% train and 25\% test. In our project, \texttt{text\_combined} is the model input and \texttt{label} is the ground-truth target.
+In this project, we use the public \texttt{Bourique/data\_email\_spam} corpus available on Hugging Face \cite{huggingface_dataset}, which provides a single split with approximately $ 85.8\text{k}$ emails in CSV format. Each row has the text field \texttt{text\_combined} (subject + body) and a binary \texttt{label} (0 = ham, 1 = spam). We will split the data into 75\% train and 25\% test. In our project, \texttt{text\_combined} is the model input and \texttt{label} is the ground-truth target.
 
 \section{ Methodology}
-The project will compare both traditional and modern models for spam email detection. The proposed approach is based on transfer learning using pre-trained BERT and DistilBERT models, which capture contextual and semantic relationships in text. To provide meaningful benchmarks, we will also implement Naive Bayes and Logistic Regression as baseline classifiers. More specifically, Naive Bayes serves as a simple yet effective probabilistic model for text classification, while Logistic Regression operates as a linear model leveraging TF–IDF features to represent weighted word importance. By contrasting these baselines with the Transformer-based models, the project aims to evaluate the performance gains brought by transfer learning in terms of accuracy, precision, recall, and F1-score.
+This project designs a spam detector and compares traditional machine learning methods with advanced transformer-based models. For the proposed model, we implement transfer learning using pre-trained BERT and DistilBERT models from the Hugging Face library. These models are fine-tuned on the spam email dataset by adding a fully connected classification layer on top of the Transformer encoder. In the preprocessing step, each input email is tokenized using the WordPiece tokenizer, truncated or padded to a fixed sequence length, and passed through the encoder to generate contextual embeddings. The hidden representation corresponding to the [CLS] token is then fed into a dense layer with a sigmoid activation for binary spam–ham classification.
+The fine-tuning process uses the AdamW optimizer with early stopping based on validation F1-score. For comparison, the baseline models will be trained on TF–IDF feature representations extracted from the same dataset. Evaluation metrics will include accuracy, precision, recall, and F1-score.
 
 
 \section{Timeline}

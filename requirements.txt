@@ -1,0 +1,27 @@
+# ===== Core scientific stack =====
+numpy==1.26.4
+pandas==2.2.2
+
+# ===== Visualization =====
+matplotlib==3.9.2
+seaborn==0.13.2
+wordcloud==1.9.3
+
+# ===== NLP / Hugging Face =====
+transformers==4.44.2
+datasets==3.0.1
+tokenizers==0.19.1
+sentencepiece==0.2.0
+accelerate==0.33.0
+
+# ===== Scikit-learn =====
+scikit-learn==1.5.1
+
+# ===== Utility =====
+tqdm==4.66.4
+regex==2024.5.15
+requests==2.32.3
+
+# ===== Environment and warnings =====
+ipykernel==6.29.5
+jupyterlab==4.2.4

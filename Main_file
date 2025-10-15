@@ -1,0 +1,93 @@
+
+\documentclass[12pt]{article}
+\usepackage[a4paper,margin=0.7in]{geometry}
+\usepackage{setspace}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{pgfgantt}
+\usepackage{titlesec}
+\bibliographystyle{IEEEtran}
+\usepackage{titlesec}
+
+\titlespacing*{\section}
+{0pt}{*0.8}{*0.65}
+
+\setstretch{1.15}
+\titleformat{\section}{\large\bfseries}{\thesection.}{0.5em}{}
+
+\begin{document}
+
+\begin{center}
+{\Large \textbf{Spam Email Classification using Transfer Learning and Transformer Models}}\\[8pt]
+{\small \textbf{COMP 6321 - Demo Report - Fall 2025}}\\[5pt]
+{\small Ayda Nodel Hokmabadi, Saumya Rana, Zar Chi Phyo, Mounika Satya Vani Gundavarapu}\\[3pt]
+\end{center}
+
+\section{Introduction}
+
+
+\section{Dataset preprocessing}
+The dataset was obtained from the Hugging Face repository and contains two primary fields: \texttt{text\_combined} (the full email content) and \texttt{label} (0 = ham, 1 = spam).  
+Initial inspection confirmed that the dataset is balanced, with approximately 50\% spam and 50\% ham messages, making it suitable for model training without bias toward either class.
+
+
+To better understand the dataset, two visualizations were generated:
+\begin{itemize}
+    \item A pie chart illustrating the balanced distribution of spam and ham messages.
+    \item A word cloud showing the most frequently occurring words within spam emails.
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/piechart.png}
+        \caption{Distribution of Spam vs. Ham Messages}
+        \label{fig:piechart}
+    \end{minipage}\hfill
+    \begin{minipage}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/wordcloud.png}
+        \caption{Most Common Words in Spam Emails}
+        \label{fig:wordcloud}
+    \end{minipage}
+\end{figure}
+
+
+
+Text normalization was applied to clean and standardize the email content while preserving meaningful spam indicators.  
+The main steps included:
+\begin{itemize}
+    \item Converting all text to lowercase for consistency.
+    \item Replacing URLs, email addresses, and numbers with representative tokens (\texttt{URL}, \texttt{EMAIL}, \texttt{NUMBER}).
+    \item Removing special characters, HTML tags, and extra whitespace.
+    \item Normalizing punctuation and repeated characters.
+\end{itemize}
+
+After normalization, very short or empty messages were removed, resulting in 85,777 valid email samples ready for model input.
+
+
+The cleaned dataset was divided into three subsets to support robust model evaluation:
+\begin{itemize}
+    \item 70\% for training,
+    \item 10\% for validation,
+    \item 20\% for testing.
+\end{itemize}
+
+Stratified sampling was applied to maintain equal proportions of spam and ham in all subsets.  
+This ensures that the model generalizes well across unseen data.
+
+The normalized dataset was tokenized using the \texttt{DistilBERT} WordPiece tokenizer.  
+Each email text was truncated or padded to a fixed maximum sequence length of 128 tokens.  
+Tokenization produced three corresponding datasets—training, validation, and testing—each containing tokenized inputs and attention masks suitable for model fine-tuning.
+
+\section{Mehtodology}
+
+\section{Numerical results}
+
+
+\section{Conclusion}
+
+
+\end{document}

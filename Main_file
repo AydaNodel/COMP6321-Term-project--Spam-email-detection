@@ -82,7 +82,54 @@ The normalized dataset was tokenized using the \texttt{DistilBERT} WordPiece tok
 Each email text was truncated or padded to a fixed maximum sequence length of 128 tokens.  
 Tokenization produced three corresponding datasets—training, validation, and testing—each containing tokenized inputs and attention masks suitable for model fine-tuning.
 
-\section{Mehtodology}
+\section{Methodology}
+
+The proposed spam email classification system leverages the power of \textit{Transformer}-based architectures, specifically \textit{DistilBERT}, a lightweight variant of BERT that retains most of its language understanding capability while being faster and more efficient for fine-tuning tasks. The methodology consists of four main stages: model selection, fine-tuning, optimization, and evaluation.
+
+\subsection{Model Architecture}
+
+\textit{DistilBERT} is a distilled version of the original \textit{Bidirectional Encoder Representations from Transformers (BERT)} model, trained using a knowledge distillation technique to achieve 97\% of BERT’s performance with 40\% fewer parameters.  
+It employs the \textit{self-attention} mechanism to capture contextual relationships between words, enabling the model to understand sentence semantics crucial for distinguishing spam from legitimate emails.
+
+The pre-trained \texttt{distilbert-base-uncased} model from the Hugging Face Transformers library was used as the base architecture. A classification head comprising a dropout layer and a fully connected dense layer was added on top to output binary predictions (spam or ham).
+
+\subsection{Fine-Tuning and Training Pipeline}
+
+The fine-tuning process involved training all model layers on the labeled dataset to adapt the language representations to the spam classification domain. The input text was first tokenized using the DistilBERT WordPiece tokenizer, producing:
+\begin{itemize}
+    \item \texttt{input\_ids} – tokenized numerical representations of text,
+    \item \texttt{attention\_mask} – binary mask indicating non-padded tokens.
+\end{itemize}
+
+These tokenized inputs were fed into the DistilBERT model, followed by the classification layer that computed logits for two classes (0 = ham, 1 = spam).  
+The output logits were passed through a \texttt{softmax} activation to obtain class probabilities.
+
+\subsection{Optimization Parameters}
+
+The model was fine-tuned using the \textit{AdamW} optimizer, which incorporates weight decay to improve generalization. The key hyperparameters were as follows:
+\begin{itemize}
+    \item \textbf{Learning rate:} $2 \times 10^{-5}$
+    \item \textbf{Batch size:} 16
+    \item \textbf{Epochs:} 3
+    \item \textbf{Weight decay:} 0.01
+    \item \textbf{Maximum sequence length:} 128 tokens
+\end{itemize}
+
+A linear learning rate scheduler with warm-up was used to stabilize early-stage training.  
+Cross-entropy loss was chosen as the objective function to measure the difference between predicted and actual labels.
+
+\subsection{Evaluation Metrics}
+
+The trained model’s performance was evaluated on the unseen test dataset using standard classification metrics:
+\begin{itemize}
+    \item \textbf{Accuracy} – measures the proportion of correctly classified emails.
+    \item \textbf{Precision} – assesses the proportion of emails predicted as spam that are truly spam.
+    \item \textbf{Recall} – measures the model’s ability to identify all spam emails.
+    \item \textbf{F1-Score} – harmonic mean of precision and recall, balancing false positives and false negatives.
+\end{itemize}
+
+The model achieving the highest F1-Score on the validation set was selected as the final version for inference. This ensures that both spam detection sensitivity and precision are optimized for real-world deployment.
+
 
 \section{Numerical results}
 

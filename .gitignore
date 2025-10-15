@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+# Virtual environments
+.venv/
+venv/
+env/
+*.env
+.env
+
+# Jupyter / Colab Notebooks
+.ipynb_checkpoints/
+*.ipynb_save
+*.ipynb_autosave
+
+# Data (inside src/)
+src/data/
+!src/data/.gitkeep
+
+# Hugging Face / Transformers Cache
+~/.cache/
+tokenized_dataset/
+cache/
+hf_cache/
+transformers_cache/
+
+# ---------------------------
+# Mac / System Files
+# ---------------------------
+.DS_Store
+Thumbs.db
+
+# IDE / Editor Settings
+.vscode/
+.idea/
+*.swp

@@ -34,6 +34,16 @@ import warnings
 warnings.filterwarnings('ignore')
 # %matplotlib inline
 
+import os
+
+# Define folder structure 
+base_dir = os.getcwd()  # current directory
+data_dir = os.path.join(base_dir, "data")
+models_dir = os.path.join(base_dir, "models")
+
+os.makedirs(data_dir, exist_ok=True)
+os.makedirs(models_dir, exist_ok=True)
+
 """**Dataset Loading**"""
 
 dataset = load_dataset("bourigue/data_email_spam")
@@ -143,6 +153,10 @@ df['text_combined'] = df['text_combined'].apply(normalize_text)
 df = df[df['text_combined'].str.len() > 0].reset_index(drop=True)
 print(f"Normalization complete: {len(df)} samples remaining")
 
+## save the cleaned dataset (for TF-IDF models) !!! put in gitignore
+cleaned_path = os.path.join(data_dir, "cleaned_spam_dataset.csv")
+df.to_csv(cleaned_path, index=False)
+
 """**Splitting dataset**"""
 
 #Test set:
@@ -168,6 +182,15 @@ print(f" Validation set: {len(val_df)} samples")
 print(f"  - Ham: {(val_df['label']==0).sum()}, Spam: {(val_df['label']==1).sum()}")
 print(f" Test set: {len(test_df)} samples")
 print(f"  - Ham: {(test_df['label']==0).sum()}, Spam: {(test_df['label']==1).sum()}")
+
+## save individual splits for consistency
+train_path = os.path.join(data_dir, "train_split.csv")
+val_path   = os.path.join(data_dir, "val_split.csv")
+test_path  = os.path.join(data_dir, "test_split.csv")
+
+train_df.to_csv(train_path, index=False)
+val_df.to_csv(val_path, index=False)
+test_df.to_csv(test_path, index=False)
 
 """**Tokenization**"""
 
@@ -197,3 +220,7 @@ tokenized_test = test_dataset.map(tokenize_function, batched=True, remove_column
 final_dataset = DatasetDict({'train': tokenized_train, 'validation': tokenized_val,'test': tokenized_test})
 
 print(final_dataset)
+
+## Save the tokenized dataset (for transformers)
+tokenized_path = os.path.join(data_dir, "tokenized_dataset")
+final_dataset.save_to_disk(tokenized_path)

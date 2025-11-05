@@ -33,7 +33,7 @@
 \lstset{style=mystyle}
 
 \titlespacing*{\section}{0pt}{*0.8}{*0.65}
-\setstretch{0.9}
+\setstretch{0.85}
 \titleformat{\section}{\large\bfseries}{\thesection.}{0.5em}{}
 
 \begin{document}
@@ -56,7 +56,7 @@ Spam detection remains a major challenge due to the high volume and evolving nat
 Recent advances in deep learning have enabled models such as RNNs and LSTMs to preserve sequential dependencies and improve accuracy \cite{johnafrica2022lstm,nasreen2024novel}. However, transformer-based models like BERT and DistilBERT have surpassed them by utilizing self-attention mechanisms to capture long-range dependencies and enable transfer learning even with smaller labeled datasets \cite{tida2022universal,songailaite2023bertphish,asliyuksek2025multimodal}. This project compares traditional and transformer-based models for spam detection, reporting progress on dataset preprocessing and baseline performance.
 
 \section{Dataset and Preprocessing for Baseline and Transformer models}
-The dataset was obtained from the Hugging Face repository, containing two main fields, \texttt{text\_combined} (email content) and \texttt{label} (0 = ham, 1 = spam). The dataset is balanced, with approximately equal proportions of spam and ham messages. To better understand the dataset, we showed the pie chart illustrating the balanced distribution of spam and ham messages \ref{fig:piechart}. Also, we have a word cloud showing the most frequently occurring words within spam emails \ref{fig:wordcloud}. For detail implementation, please see \hyperref[lst:preprocess_code]{Appendix~A}. or \href{https://github.com/AydaNodel/COMP6321-Term-project--Spam-email-detection/blob/main/src/preprocessing.py}{GitHub file}.
+The dataset was obtained from the Hugging Face repository \cite{huggingface_dataset}, containing two main fields, \texttt{text\_combined} (email content) and \texttt{label} (0 = ham, 1 = spam). The dataset is balanced, with approximately equal proportions of spam and ham messages. To better understand the dataset, we showed the pie chart illustrating the balanced distribution of spam and ham messages \ref{fig:piechart}. Also, we have a word cloud showing the most frequently occurring words within spam emails \ref{fig:wordcloud}. For detail implementation, please see  \href{https://github.com/AydaNodel/COMP6321-Term-project--Spam-email-detection/blob/main/src/preprocessing.py}{GitHub file}.
 
 \begin{figure}[h!]
     \centering
@@ -79,7 +79,7 @@ For Naive Bayes and LR, text was transformed into TF--IDF feature vectors. TF--I
 For the proposed BERT and DistilBERT models, text normalization was applied to clean and standardize email content while retaining relevant spam indicators. Steps included lowercasing, token replacement for URLs and emails, and removal of unnecessary symbols. After filtering short or empty messages, 85,777 samples remained. The data was split into 70\% training, 10\% validation, and 20\% testing using stratified sampling. Tokenization was performed using the DistilBERT WordPiece tokenizer, with sequences truncated or padded to 128 tokens.
 
 \section{Baseline Models and Results}
-Naive Bayes and LR were selected as baselines due to their efficiency and strong performance in text classification. For detail implementation, please see \hyperref[lst:train_code]{Appendix~B} or 
+Naive Bayes and LR were selected as baselines due to their efficiency and strong performance in text classification. For detail implementation, please see 
 \href{https://github.com/AydaNodel/COMP6321-Term-project--Spam-email-detection/blob/main/src/baseline_models.py}{GitHub file}.
 
 \subsection{Naive Bayes}
@@ -143,7 +143,7 @@ LR & \textbf{0.982} & 0.980 & 0.984 & 0.982 \\
 
 \section{Outline Plan}
 The next stage of the project focuses on implementing transformer-based architectures, specifically BERT and DistilBERT.  
-Dataset preprocessing, normalization, tokenization, and splits have been completed. Initial model training has also been conducted, and first results have been obtained; the detailed analysis and final results will be presented in the final report. Model fine-tuning and evaluation will be performed in the next phase, with performance compared against the established baselines. There are potential risks, such as overfitting during fine-tuning, which can be mitigated by using regularization techniques or applying early stopping on validation loss. And, if there will be bias toward long/short emails, we will normalize sequence lengths, evaluate the model across email length groups.
+Dataset preprocessing, normalization, tokenization, and splits have been completed. Initial model training has also been conducted, and first results have been obtained; the detailed analysis and final results will be presented in the final report. Model fine-tuning and evaluation will be performed in the next phase, with performance compared against the established baselines. There are potential risks, such as overfitting during fine-tuning, which can be mitigated by using regularization techniques or applying early stopping on validation loss. And, if there will be bias toward long/short emails, we will normalize sequence lengths and evaluate the model across email length groups. In addition, we will also try to add a classification head to see if it affects the performance.
 
 In this progress report, we presented the dataset preparation and baseline evaluation for spam email detection. The results demonstrate that both Naive Bayes and LR achieve strong performance, with LR showing superior accuracy and recall. These baselines provide a solid foundation for comparing transformer-based models, which are expected to leverage contextual understanding for further performance gains. Future work will involve fine-tuning BERT and DistilBERT on the processed dataset between Nov 5 to 15 and evaluating their effectiveness relative to the baseline results between Nov 16 to 22, and plan to submit the final report on Nov 30.
 
@@ -151,44 +151,23 @@ In this progress report, we presented the dataset preparation and baseline evalu
 \centering
 \caption{Team Contributions and Responsibilities}
 \renewcommand{\arraystretch}{1.2}
-\begin{tabular}{|l|p{4.2cm}|p{4.2cm}|p{4.2cm}|}
+\begin{tabular}{|l|p{6cm}|p{6cm}|}
 \hline
-\textbf{Name} &
-\thead{Contribution\\(Completed work)} &
-\thead{Contribution\\(Upcoming work)} &
-\thead{Responsibilities\\(Remaining stages)} \\
+\textbf{Name} & 
+\textbf{Completed Work} & 
+\textbf{Upcoming Work} \\
 \hline
-Ayda   & … & … & … \\
+Ayda & Data preprocessing, and drafting the project proposal and report, Reviewed Transformer and baseline models& BERT/distilBERT models evaluations for the fine-tuning results, Final report  \\
 \hline
-Saumya & … & … & … \\
+Saumya & Implemented Baseline Models and evaluation metrics, Created the overall project structure, Reviewed Transformer Model  & Evaluating Transformer models, Final Evaluation Comparisons, Writing Final Report \\
 \hline
-Zar Chi& … & … & … \\
+Zar Chi& Reviewed the baseline code, Wrote Proposal and Project report & Fine-tuning of transformer models and writing result comparison discussion and conclusion\\
 \hline
-Satya  & … & … & … \\
+Satya  & Reviewed all the baseline models, started the transformer model & implemented BERT and distilBERT model, plotting and result discussion   \\
 \hline
 \end{tabular}
 \label{tab:project_contribution}
 \end{table}
-
-
-\newpage
-\appendix
-
-\begin{center}
-    \LARGE \textbf{Appendix}
-\end{center}
-
-
-\section{Python Code for Preprocessing Training}
-
-\lstinputlisting[language=Python, caption={Preprocessing}, label={lst:preprocess_code}]{preprocessing.py}
-
-\newpage
-\section{Python Code for Baseline Training}
-
-\lstinputlisting[language=Python, caption={Spam Email Baseline Classification Model}, label={lst:train_code}]{baseline_models.py}
-
-
 
 \newpage
 \bibliography{reference}

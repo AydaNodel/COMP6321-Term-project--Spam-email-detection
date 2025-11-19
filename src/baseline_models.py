@@ -76,6 +76,16 @@ def evaluate_model(name, y_true, y_pred):
     print(f"f1-score:  {f1:.3f}")
     return acc, prec, rec, f1
 
+print("\nEvaluating training performance...")
+
+# predictions on training data
+nb_train_preds = nb_model.predict(X_train)
+lr_train_preds = lr_model.predict(X_train)
+
+# evaluate on training set
+nb_train_metrics = evaluate_model("naive bayes (train)", y_train, nb_train_preds)
+lr_train_metrics = evaluate_model("logistic regression (train)", y_train, lr_train_preds)
+
 # evaluate models
 nb_metrics = evaluate_model("naive bayes", y_test, nb_preds)
 lr_metrics = evaluate_model("logistic regression", y_test, lr_preds)
@@ -107,14 +117,23 @@ print("models saved to:", MODEL_DIR)
 # save metrics
 results = pd.DataFrame({
     "model": ["naive bayes", "logistic regression"],
-    "accuracy": [nb_metrics[0], lr_metrics[0]],
-    "precision": [nb_metrics[1], lr_metrics[1]],
-    "recall": [nb_metrics[2], lr_metrics[2]],
-    "f1-score": [nb_metrics[3], lr_metrics[3]]
+    
+    "train_accuracy":  [nb_train_metrics[0], lr_train_metrics[0]],
+    "test_accuracy":   [nb_metrics[0], lr_metrics[0]],
+    
+    "train_precision": [nb_train_metrics[1], lr_train_metrics[1]],
+    "test_precision":  [nb_metrics[1], lr_metrics[1]],
+    
+    "train_recall":    [nb_train_metrics[2], lr_train_metrics[2]],
+    "test_recall":     [nb_metrics[2], lr_metrics[2]],
+    
+    "train_f1":        [nb_train_metrics[3], lr_train_metrics[3]],
+    "test_f1":         [nb_metrics[3], lr_metrics[3]]
 })
+
 
 results_path = os.path.join(MODEL_DIR, "baseline_results.csv")
 results.to_csv(results_path, index=False)
 print("metrics saved to:", results_path)
 
-print("baseline training complete.")
+print("baseline training complete")

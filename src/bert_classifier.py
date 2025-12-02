@@ -23,8 +23,6 @@ from transformers.trainer_callback import TrainerCallback
 import re
 import seaborn as sns
 
-
-
 !pip install -q "transformers==4.35.2" "accelerate==0.26.1" "peft==0.7.1" --upgrade
 
 !pip install --upgrade optuna matplotlib
@@ -335,7 +333,7 @@ FINAL_MODEL_DIR = os.path.join(MODEL_DIR, "final_bert_model")
 os.makedirs(FINAL_MODEL_DIR, exist_ok=True)
 
 #  Training the final model with best values:
-print("\n=== Training final BERT with best hyperparameters ===")
+print("\n Training final BERT with best hyperparameters:")
 
 bp = study.best_trial.params
 
@@ -350,15 +348,12 @@ final_model = BertForSequenceClassification.from_pretrained("bert-base-uncased",
 final_model.config.hidden_dropout_prob = best_drop
 final_model.config.attention_probs_dropout_prob = best_drop
 
-final_args = TrainingArguments(output_dir=FINAL_MODEL_DIR,          overwrite_output_dir=True,
+final_args = TrainingArguments(output_dir=FINAL_MODEL_DIR, overwrite_output_dir=True,
     num_train_epochs=best_epochs, per_device_train_batch_size=best_bsz,
-    per_device_eval_batch_size=64, learning_rate=best_lr,
-    weight_decay=best_wd, logging_dir=LOG_DIR,
-    logging_strategy="steps", logging_steps=100,
-    evaluation_strategy="steps", eval_steps=200,
-    save_strategy="steps", save_steps=200,
-    save_total_limit=1, fp16=torch.cuda.is_available(),
-    report_to="none")
+    per_device_eval_batch_size=64, learning_rate=best_lr, weight_decay=best_wd,
+    logging_dir=LOG_DIR, logging_strategy="steps", logging_steps=100,
+    evaluation_strategy="steps", eval_steps=200, save_strategy="steps", save_steps=200,
+    save_total_limit=1, fp16=torch.cuda.is_available(), report_to="none")
 
 metrics_cb = MetricsCallback()
 
@@ -380,12 +375,8 @@ y_pred = np.argmax(test_output.predictions, axis=1)
 cm = confusion_matrix(y_true, y_pred)
 print("Confusion matrix:\n", cm)
 
-# Optional: save numeric CM as CSV
-cm_df = pd.DataFrame(
-    cm,
-    index=["True: Non-spam", "True: Spam"],
-    columns=["Pred: Non-spam", "Pred: Spam"],
-)
+
+cm_df = pd.DataFrame(cm, index=["True: Non-spam", "True: Spam"], columns=["Pred: Non-spam", "Pred: Spam"])
 cm_df.to_csv(os.path.join(FINAL_MODEL_DIR, "confusion_matrix.csv"), index=True)
 
 # Plot confusion matrix:
@@ -400,7 +391,7 @@ plt.tight_layout()
 plt.savefig(os.path.join(FINAL_MODEL_DIR, "confusion_matrix.png"), dpi=300)
 
 # Test evaluation:
-print("Evaluating on test set:")
+print("Test set evaluation:")
 test_results = final_trainer.evaluate(test_ds)
 for k, v in test_results.items():
     if isinstance(v, float):
@@ -418,3 +409,26 @@ metric_df = pd.DataFrame({ "step": metrics_cb.metric_steps, "eval_accuracy": met
 train_loss_df.to_csv(os.path.join(MODEL_DIR, "train_loss_history.csv"), index=False)
 eval_loss_df.to_csv(os.path.join(MODEL_DIR, "eval_loss_history.csv"), index=False)
 metric_df.to_csv(os.path.join(MODEL_DIR, "eval_metric_history.csv"), index=False)
+
+print("\nSample Test Predictions:")
+num_samples = 10
+
+sample_ds = test_ds.select(range(num_samples))
+
+pred_output = final_trainer.predict(sample_ds)
+pred_logits = pred_output.predictions
+pred_labels = pred_logits.argmax(axis=1)
+
+for i in range(num_samples):
+    item = sample_ds[i]
+    input_ids = item["input_ids"]
+
+    text = tokenizer.decode(input_ids, skip_special_tokens=True)
+
+    true_label = int(item["labels"])
+    pred_label = int(pred_labels[i])
+
+    print(f"\nExample {i+1}:")
+    print("Text:", text)
+    print("True Label:     ", true_label)
+    print("Predicted Label:", pred_label)

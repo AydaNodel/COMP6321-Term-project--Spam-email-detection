@@ -1,0 +1,174 @@
+\documentclass[12pt]{article}
+\usepackage[a4paper, top=1.6cm, bottom=1.8cm, left=1.6cm, right=1.6cm]{geometry}
+\usepackage{setspace}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{pgfgantt}
+\usepackage{titlesec}
+\bibliographystyle{IEEEtran}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{attachfile2}
+\usepackage{hyperref}
+
+\usepackage{attachfile2}
+\usepackage{makecell}
+
+\lstdefinestyle{mystyle}{
+  backgroundcolor=\color{gray!5},
+  commentstyle=\color{green!50!black},
+  keywordstyle=\color{blue!80!black},
+  numberstyle=\tiny\color{gray},
+  stringstyle=\color{orange!90!black},
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  numbers=left,
+  numbersep=6pt,
+  frame=single,
+  tabsize=4,
+  showstringspaces=false
+}
+
+\lstset{style=mystyle}
+
+\titlespacing*{\section}{0pt}{*0.8}{*0.65}
+\setstretch{0.85}
+\titleformat{\section}{\large\bfseries}{\thesection.}{0.5em}{}
+
+\begin{document}
+
+\begin{center}
+{\Large \textbf{Spam Email Classification using Transfer Learning and Transformer Models}}\\[8pt]
+{\small \textbf{COMP 6321 - Progress Report - Fall 2025}}\\[5pt]
+{\small Ayda Nodel Hokmabadi, Saumya Rana, Zar Chi Phyo, Mounika Satya Vani Gundavarapu}\\[3pt]
+\end{center}
+
+\vspace*{-2em}
+\normalfont\normalsize
+\begin{abstract}
+This project aims to implement an effective spam email classification by leveraging both traditional and modern natural language processing (NLP) techniques. As baselines, we designed and evaluated Naive Bayes and Logistic Regression (LR) models using TF--IDF features, achieving strong classification accuracy. Building upon these results, we are currently developing a transformer-based approach using pretrained BERT and DistilBERT models to capture deeper semantic representations of text. The dataset has been preprocessed and tokenized for fine-tuning, and the final implementation of the proposed model is in progress.
+\end{abstract}
+
+\section{Introduction}
+Spam detection remains a major challenge due to the high volume and evolving nature of malicious emails, which can lead to phishing, fraud, and data breaches \cite{banday2009effectiveness,wang2025review}. Early rule-based filters lacked adaptability, leading to a shift toward supervised machine learning algorithms such as Naive Bayes, LR, and Support Vector Machines using bag-of-words and TF--IDF features \cite{hassan2022analytics,chavez2020nb}. While these models achieve good performance, they fail to capture contextual and semantic meaning.
+
+Recent advances in deep learning have enabled models such as RNNs and LSTMs to preserve sequential dependencies and improve accuracy \cite{johnafrica2022lstm,nasreen2024novel}. However, transformer-based models like BERT and DistilBERT have surpassed them by utilizing self-attention mechanisms to capture long-range dependencies and enable transfer learning even with smaller labeled datasets \cite{tida2022universal,songailaite2023bertphish,asliyuksek2025multimodal}. This project compares traditional and transformer-based models for spam detection, reporting progress on dataset preprocessing and baseline performance.
+
+\section{Dataset and Preprocessing for Baseline and Transformer models}
+The dataset was obtained from the Hugging Face repository \cite{huggingface_dataset}, containing two main fields, \texttt{text\_combined} (email content) and \texttt{label} (0 = ham, 1 = spam). The dataset is balanced, with approximately equal proportions of spam and ham messages. To better understand the dataset, we showed the pie chart illustrating the balanced distribution of spam and ham messages \ref{fig:piechart}. Also, we have a word cloud showing the most frequently occurring words within spam emails \ref{fig:wordcloud}. For detail implementation, please see  \href{https://github.com/AydaNodel/COMP6321-Term-project--Spam-email-detection/blob/main/src/preprocessing.py}{GitHub file}.
+
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}[t]{0.35\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{piechart.png}
+        \caption{Distribution of spam vs. ham messages}
+        \label{fig:piechart}
+    \end{minipage}\hspace{3cm}
+    \begin{minipage}[t]{0.35\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{wordcloud.png}
+        \caption{Most common words in spam emails}
+        \label{fig:wordcloud}
+    \end{minipage}
+\end{figure}
+
+For Naive Bayes and LR, text was transformed into TF--IDF feature vectors. TF--IDF assigns higher weights to words that are frequent within a document but rare across the dataset, capturing discriminative patterns while suppressing common terms like “the” or “and.” This representation enables classical models to focus on key spam-related terms. 
+
+For the proposed BERT and DistilBERT models, text normalization was applied to clean and standardize email content while retaining relevant spam indicators. Steps included lowercasing, token replacement for URLs and emails, and removal of unnecessary symbols. After filtering short or empty messages, 85,777 samples remained. The data was split into 70\% training, 10\% validation, and 20\% testing using stratified sampling. Tokenization was performed using the DistilBERT WordPiece tokenizer, with sequences truncated or padded to 128 tokens.
+
+\section{Baseline Models and Results}
+Naive Bayes and LR were selected as baselines due to their efficiency and strong performance in text classification. For detail implementation, please see 
+\href{https://github.com/AydaNodel/COMP6321-Term-project--Spam-email-detection/blob/main/src/baseline_models.py}{GitHub file}.
+
+\subsection{Naive Bayes}
+As our baseline model for spam email detection, we use a Naive Bayes classifier, a probabilistic classifier based on Bayes' theorem that assumes conditional independence between features given the class label. Despite this ``naive'' independence assumption, the algorithm performs remarkably well for text classification, which makes it an ideal benchmark than complex models. It offers a lot of benefits: It requires minimal training data, trains quickly with linear time complexity, works well with high-dimensional feature spaces, and gives clear probability estimates.
+
+The classifier computes the posterior probability of an email being spam or legitimate by calculating:
+
+\begin{equation}
+P(\text{spam}|\text{email}) \propto P(\text{spam}) \times \prod_{i} P(\text{word}_i|\text{spam})
+\end{equation}
+
+For each email, the model estimates the likelihood of observing specific words given the spam/legitimate class, then multiplies these probabilities with the prior class probability. The email is classified based on which class yields the higher posterior probability.
+
+
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}[t]{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{conmatNB.png}
+        \caption{Confusion matrix for the Naive Bayes algorithm}
+        \label{fig:nb_confusion}
+    \end{minipage}\hfill
+    \begin{minipage}[t]{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{conmatLR.PNG}
+        \caption{Confusion matrix for the LR algorithm}
+        \label{fig:lr_confusion}
+    \end{minipage}
+\end{figure}
+
+The Naive Bayes classifier achieved strong performance on the test dataset, with an accuracy of 95.5\%, precision of 97.8\%, recall of 93.2\%, and F1-score of 95.4\%. In Fig.~\ref{fig:nb_confusion}, the confusion matrix illustrates the model's classification performance across both classes. Out of 17,156 test samples, the model correctly classified  8,398 legitimate emails (class 0) and 7,992 spam emails (class 1). However, it misclassified 181 legitimate emails as spam (false positives) and 585 spam emails as legitimate (false negatives). The high precision indicates that when the model predicts an email as spam, it gives 97.8\% of the time. The recall of 93.2\% shows the model successfully identifies the majority of spam emails, though some spam still passes through to the inbox. These results demonstrate that Naive Bayes provides a robust baseline for spam detection, effectively balancing false positive and false negative rates.
+
+
+\subsection{Logistic Regression}
+LR is a discriminative linear classifier that models the probability of an email belonging to the spam class using the logistic (sigmoid) function. Unlike Naive Bayes, which models the joint probability distribution of features and class labels, and is less sensitive to feature dependencies. The model handles continuous features naturally. Moreover, it is computationally efficient and fits well with high-dimensional data, and is ideal for text classification tasks. LR directly estimates the posterior probability through a linear decision boundary.
+
+The model computes the probability of spam using:
+
+\begin{equation}
+P(\text{spam}|\text{email}) = \sigma(\mathbf{w}^T\mathbf{x} + b) = \frac{1}{1 + e^{-(\mathbf{w}^T\mathbf{x} + b)}}
+\end{equation}
+
+where $\mathbf{w}$ is the weight vector, $\mathbf{x}$ is the feature vector representing the email, $b$ is the bias term, and $\sigma$ is the sigmoid function. The model learns optimal weights through maximum likelihood estimation, typically using gradient-based optimization methods.
+
+The LR classifier demonstrated superior performance compared to the Naive Bayes baseline, achieving an accuracy of 98.1\%, precision of 97.9\%, recall of 98.4\%, and F1-score of 98.2\%. In Fig.~\ref{fig:lr_confusion}, the confusion matrix shows excellent classification performance across both classes. Out of 17,156 test samples, the model correctly classified 8,399 legitimate emails (class 0) and 8,439 spam emails (class 1), while misclassifying only 180 legitimate emails as spam (false positives) and 138 spam emails as legitimate (false negatives). LR captures more spam emails compared to Naive Bayes by checking the recall of 98.4\%, and it reduces the number of spam messages reaching the inbox while the precision remains high at 97.9\%, ensuring minimal disruption to legitimate communications. These results suggest that LR provides better generalization than that of Naive Bayes, making it a stronger candidate for spam detection applications.
+
+\begin{table}[h!]
+\centering
+\caption{Performance comparison of baseline models}
+\begin{tabular}{lcccc}
+\hline
+\textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-score} \\
+\hline
+Naive Bayes & \textbf{0.953} & 0.977 & 0.928 & 0.952 \\
+LR & \textbf{0.982} & 0.980 & 0.984 & 0.982 \\
+\hline
+\end{tabular}
+\label{tab:baseline_results}
+\end{table}
+
+
+\section{Outline Plan}
+The next stage of the project focuses on implementing transformer-based architectures, specifically BERT and DistilBERT.  
+Dataset preprocessing, normalization, tokenization, and splits have been completed. Initial model training has also been conducted, and first results have been obtained; the detailed analysis and final results will be presented in the final report. Model fine-tuning and evaluation will be performed in the next phase, with performance compared against the established baselines. There are potential risks, such as overfitting during fine-tuning, which can be mitigated by using regularization techniques or applying early stopping on validation loss. And, if there will be bias toward long/short emails, we will normalize sequence lengths and evaluate the model across email length groups. In addition, we will also try to add a classification head to see if it affects the performance.
+
+In this progress report, we presented the dataset preparation and baseline evaluation for spam email detection. The results demonstrate that both Naive Bayes and LR achieve strong performance, with LR showing superior accuracy and recall. These baselines provide a solid foundation for comparing transformer-based models, which are expected to leverage contextual understanding for further performance gains. Future work will involve fine-tuning BERT and DistilBERT on the processed dataset between Nov 5 to 15 and evaluating their effectiveness relative to the baseline results between Nov 16 to 22, and plan to submit the final report on Nov 30.
+
+\begin{table}[h!]
+\centering
+\caption{Team Contributions and Responsibilities}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|l|p{6cm}|p{6cm}|}
+\hline
+\textbf{Name} & 
+\textbf{Completed Work} & 
+\textbf{Upcoming Work} \\
+\hline
+Ayda & Data preprocessing, and drafting the project proposal and report, Reviewed Transformer and baseline models& BERT/distilBERT models evaluations for the fine-tuning results, Final report  \\
+\hline
+Saumya & Implemented Baseline Models and evaluation metrics, Created the overall project structure, Reviewed Transformer Model  & Evaluating Transformer models, Final Evaluation Comparisons, Writing Final Report \\
+\hline
+Zar Chi& Reviewed the baseline code, Wrote Proposal and Project report & Fine-tuning of transformer models and writing result comparison discussion and conclusion\\
+\hline
+Satya  & Reviewed all the baseline models, started the transformer model & implemented BERT and distilBERT model, plotting and result discussion   \\
+\hline
+\end{tabular}
+\label{tab:project_contribution}
+\end{table}
+
+\newpage
+\bibliography{reference}
+\end{document}

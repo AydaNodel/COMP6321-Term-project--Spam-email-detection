@@ -1,0 +1,358 @@
+\documentclass{article}
+
+\usepackage[final]{neurips_2025}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning,calc}
+\usepackage{amsmath,amssymb}
+
+\usepackage[many]{tcolorbox}
+\usepackage{empheq}
+\usetikzlibrary{shadows}
+
+\tcbset{
+  highlight math style={
+    enhanced,
+    colframe=red!60!black,
+    colback=yellow!50,
+    arc=4pt,
+    boxrule=1pt,
+    drop fuzzy shadow
+  }
+}
+
+\usepackage{amsmath,amsthm}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{mdframed}
+\usepackage{minitoc}
+\setcounter{parttocdepth}{3}
+
+\newtheorem{assumption}{Assumption}
+\newtheorem{proposition}{Proposition}
+\newtheorem{condition}{Condition}
+\newtheorem{remark}{Remark}
+\newtheorem{corollary}{Corollary}
+\newtheorem{lemma}{Lemma}
+\newcommand{\idea}[1]{\textcolor{blue}{(Idea) #1}}
+
+  \newcommand{\xxcomment}[4]{\textcolor{#1}{[$^{\textsc{#2}}_{\textsc{#3}}$ #4]}}
+  \newcommand{\ElvisFix}[1]{\xxcomment{magenta}{E}{D}{#1}}
+ 
+  % \newcommand{\ElvisIssue}[1]{\xxcomment{magenta}{E}{D}{#1}}
+
+  \newcommand{\ElvisIssue}[1]{}
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+%     \usepackage[preprint]{neurips_2025}
+
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+%     \usepackage[final]{neurips_2025}
+
+
+% to avoid loading the natbib package, add option nonatbib:
+%    \usepackage[nonatbib]{neurips_2025}
+
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+
+
+\title{Spam Email Classification using Transfer Learning and Transformer Models}
+
+\author{%
+ Ayda Nodel Hokmabadi \quad Saumya Rana \quad Zar Chi Phyo \quad Mounika Satya Vani Gundavarapu}
+
+\setcounter{tocdepth}{0} %% uncomment line for non-verbose ToC
+
+\begin{document}
+
+
+\maketitle
+
+\begin{abstract}
+Despite many years of research and filtering, spam emails continue to be a problem for us. Traditional machine learning techniques, such as Naive Bayes and logistic regression, have had good results, but developments in deep learning are pointing towards transformer-based models being the next best methods in spam detection. This study investigates the performance of BERT and DistilBERT compared to the traditional baselines in spam detection. All models were trained on a balanced dataset, and the hyperparameter tuning for transformer models was done through Optuna for fair comparison. Results show the improvement of each method in accuracy, precision, recall, and F1-score while taking into account the trade-off with computational efficiency. 
+    
+\end{abstract}
+
+\section{Introduction}
+Spam emails are still a big issue, and they are continuously changing even though there have been many attempts to filter them. The classic methods, such as Naive Bayes and logistic regression, have had success, but still are not enough, as the spammers are using more sophisticated methods. Deep Learning techniques have come a long way, especially with transformer-based models such as BERT/DistilBERT, which can understand the language context better. The performance of these transformer-based models is to be compared with the traditional baselines in order to show their superiority in spam filtering and whether the increased complexity is worth the computational expense through the usage of the Optuna toolbox for hyperparameter tuning. However, even with high accuracy, these systems can still misclassify important legitimate emails as spam, which can have serious negative consequences.
+
+\paragraph{Main Contributions.}
+This project compares traditional and modern approaches to spam email detection. Here's what we actually did and why it matters:
+
+\begin{itemize}
+    \item We trained and compared four different models, Naive Bayes and logistic regression as baselines, and  BERT and DistilBERT as the proposed models.
+    \item We used a balanced dataset of 85,777 emails from Hugging Face.
+    \item  We used Optuna to automatically find the best settings for BERT and DistilBERT, so we're comparing each model at its best rather than just using default settings.
+    \item All models were tested on the same data, and we measured accuracy, precision, recall, and F1-score for each one.
+    \item  We looked at whether the transformer models actually perform better than simple traditional methods and whether the extra computational cost is worth it.
+\end{itemize}
+
+\section{Literature Review}
+Over the past two decades, spam detection has become one of the important problems in the digital world. From the simple application of rules and probabilistic methods, it has now evolved into a machine learning problem. One of the early developments was the Bayesian spam filter introduced in \cite{sahami1998bayesian}, which later became a tool that was snatched up and used widely. A few years later, \cite{metsis2006spam} carried on with their research by comparing different Naive Bayes models, through which the influence of different probability estimates on detection accuracy was uncovered. At the same time, Support Vector Machines were being tested as classic approaches \cite{drucker1999support} while \cite{androutsopoulos2000evaluation} investigated the accuracy-speed compromise in this area. One main issue has been text representation in the entire process. The study in \cite{zhang2004evaluation} proved that using both statistical and structural features leads to better performance, while the TF-IDF method gained momentum for its ability to highlight important terms by reducing the impact of common words \cite{rennie2000application}. With the introduction of deep learning algorithms, the spam detection area also has a significant change; \cite{kim2014convolutional} has already showed that Convolutional Neural Networks (CNNs) can automatically discover text features. Recurrent Neural Networks, particularly Long Short-Term Memory (LSTM) networks, were explored for sequential text processing in spam detection \cite{hochreiter1997long}. Word embedding techniques like Word2Vec and GloVe provided dense vector representations that captured semantic relationships \cite{mikolov2013efficient}. The launch of Transformers \cite{vaswani2017attention}, along with BERT \cite{devlin2019bert}, gave models the power to draw on both the preceding and following context, thus making them more flexible with only a small amount of training data. Pre-trained language models demonstrated significant improvements in various NLP tasks including text classification \cite{howard2018universal}. The latter work on DistilBERT was introduced in \cite{sanh2019distilbert}.
+
+\section{Methodology}
+Naive Bayes and Logistic Regression were selected as baselines and BERT and distilBERT models are studied as the proposed algorithms. For detailed implementation, please see the link
+\href{https://github.com/AydaNodel/COMP6321-Term-project--Spam-email-detection/tree/main}{GitHub file}.
+
+
+We used the public HuggingFace dataset \cite{huggingface_dataset}, which contains 85,777 labelled emails. We then applied basic processing. It includes lowercase conversion, removal of unnecessary characters, URL replacement, whitespace normalization, etc. The cleaned dataset was then split into 70\% for training, 10\% for validation, and 20\% for testing, using stratified sampling to maintain label balance. For the baseline model, we used this cleaned text. For transformer models, we used the WordPiece tokenizer with a maximum sequence length of 128. 
+
+
+\subsection{Naive Bayes}
+Naive Bayes is a probabilistic classifier based on Bayes' theorem that assumes conditional independence between features. Despite this "naive" assumption, it performs remarkably well for text classification with minimal training data and linear time complexity. The classifier computes the posterior probability of an email being spam:
+\[
+P(\text{spam}|\text{email}) \propto P(\text{spam}) \times \prod_{i} P(\text{word}_i|\text{spam})
+\]
+Even though the assumption is unrealistic, it works well for text because TF-IDF features are sparse.
+
+\subsection{Logistic Regression}
+Logistic Regression is a discriminative linear classifier that directly estimates the posterior probability through a linear decision boundary. It handles continuous features naturally and is computationally efficient with high-dimensional data. The model computes the probability of spam using:
+\[
+P(\text{spam}|\text{email}) = \sigma(\mathbf{w}^T\mathbf{x} + b) = \frac{1}{1 + e^{-(\mathbf{w}^T\mathbf{x} + b)}}
+\]
+where $\mathbf{w}$ is the weight vector, $\mathbf{x}$ is the feature vector, $b$ is the bias term, and $\sigma$ is the sigmoid function.
+
+
+
+\subsection{BERT Transformer Model}
+BERT is a Transformer-based language model that uses self-attention layers to learn contextual relationships between words. BERT is bidirectional, which means that it considers both left and right context at the same time; therefore, it can capture more semantic meaning than traditional sequential models. This is very useful when dealing with text classification, which includes spam detection.
+
+We used bert-base-uncased for our transformer part of the project. It has 12 encoder layers and 12 attention heads (hidden size of 6768). We used the normal BERT tokenizer (WordPiece). It lowercases the text and then splits it into subwords. 
+
+\subsection{DistilBERT Transformer Model}
+DistilBERT is a lightweight, compressed version of BERT created through knowledge distillation. It is based on a reduced number of layers and parameters and a lower speed of about 40-60\% of BERT when it comes to language understanding capabilities. Although it is smaller, DistilBERT maintains the fundamental Transformer design and bidirectional attention, which makes it efficient and ideal in real-time or resource-intensive text classification and similar applications.
+
+As the second part of our proposed methodology, we trained a DistilBERT model using distilbert-base-uncased, a lighter version of BERT with 6 encoder layers. All emails were processed using the WordPiece tokenizer with a maximum sequence length of 128. The model has a classification head that uses a linear layer on the final hidden state for binary spam classification. Finally, we fine-tuned the model with different learning rates, numbers of epochs, batch sizes, and dropout values, using the Optuna toolbox to select the best hyperparameters. After selecting the best settings, we retrained the DistilBERT classifier and evaluated it on the test set, recording performance metrics, loss curves, and confusion matrices for comparison with the BERT model.
+
+%==============================================================================
+\section{Experimental Results}
+All experiments were done in Google Colab with a T4-GPU enabled, and used google Drive for the saving data with 100 Gb storage. 
+
+The Naive Bayes classifier achieved strong performance with 95.5\% accuracy, 97.8\% precision, 93.2\% recall, and 95.4\% F1-score. As shown in Fig.~\ref{fig:cm_nb}, the model correctly classified 8,398 legitimate emails and 7,992 spam emails, with 181 false positives and 585 false negatives. The high precision means that spam predictions are correct 97.8\% of the time, while the 93.2\% recall shows that most spam is caught, though some still gets through.
+
+Logistic regression outperformed Naive Bayes with 98.1\% accuracy, 97.9\% precision, 98.4\% recall, and 98.2\% F1-score. As shown in Fig.~\ref{fig:cm_lr}, it correctly classified 8,399 legitimate emails and 8,439 spam emails, with only 180 false positives and 138 false negatives. The 98.4\% recall indicates it catches more spam than Naive Bayes while maintaining high precision, making it a stronger baseline for spam detection.
+
+Fig.~\ref{bert_optuna} in Appendix~A illustrates the hyperparameter optimization process using Optuna for tuning the BERT model. The tuning parameters are the learning rate, weight decay, batch size, and the number of training epochs. The objective was to maximize the F1-score validation. The four subfigures show how each hyperparameter has an impact on performance improvements.  For more numerical details, please check Appendix~A.
+
+
+ Fig.~\ref{fig:bert_training} illustrates the training behavior of BERT before and after tuning. The training and validation losses are lower after tuning, overfitting decreases, and accuracy increases to about 0.995. All in all, hyperparameter optimization provides more stable training dynamics, lower loss values, and a definite increase in classification performance.
+
+
+
+\begin{figure}[h!]
+    \centering
+    % Row 1
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{before_optuna.png}
+        \caption{Before Hyperparameter tuning by Optuna}
+    \end{subfigure}%
+    \hspace{1cm}
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{after_optuna.png}
+        \caption{After Hyperparameter tuning by Optuna}
+    \end{subfigure}
+    \vspace{0.4cm}
+    \caption{BERT model performance vs the training steps}
+    \label{fig:bert_training}
+\end{figure} 
+
+
+
+DistilBERT, a lightweight and distilled version of BERT, outperforms traditional benchmarks. Even before tuning the hyperparameter, DistilBERT achieved 99.28\% accuracy, which already exceeded baseline model performance. After tuning with Optuna, DistilBERT improved to 99.31\% accuracy. The optimized model showed excellent precision (99.35\%) and recall (99.27\%), demonstrating a great capacity to correctly identify spam and ham emails. Overall, DistilBERT provides lower computational complexity while giving a better trade-off between performance and efficiency than BERT.
+
+
+Fig.~\ref{distil_optuna} in Appendix~A shows the hyperparameter tuning process using Optuna for the DistilBERT model. The tuning parameters are the learning rate, weight decay, batch size, and the number of training epochs. The objective was to maximize the F1-score validation. The four subfigures show how each hyperparameter has an impact on performance improvements. For more numerical details, please check Appendix~A.
+
+\begin{figure}[h!]
+    \centering
+
+    % Row 1
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{distil_optuna.png}
+        \caption{Before Hyperparameter tuning by Optuna }
+    \end{subfigure}%
+    \hspace{1cm}
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{distilbertFT_update_combined.png}
+        \caption{After Hyperparameter tuning by Optuna}
+    \end{subfigure}
+    \vspace{0.4cm}
+    \caption{DistilBERT model performance vs the training steps}
+    \label{fig:distilbert_training}
+\end{figure} 
+
+ Fig.~\ref{fig:distilbert_training} illustrates the training behavior of DistilBERT before and after tuning. The training and validation losses are lower after tuning, overfitting decreases, and accuracy increases to about 0.995. All in all, hyperparameter optimization provides more stable training dynamics, lower loss values, and a definite increase in classification performance.
+ 
+
+\begin{figure}[h!]
+    \centering
+    \makebox[\textwidth][c]{%
+        \begin{subfigure}{0.28\textwidth}
+            \centering
+            \includegraphics[width=4.7cm]{conmatLR.jpeg}
+            \caption{Logistic Regression}
+            \label{fig:cm_lr}
+        \end{subfigure}\hspace{0.6cm}
+        \begin{subfigure}{0.28\textwidth}
+            \centering
+            \includegraphics[width=4.5cm]{conmatNB.jpeg}
+            \caption{Naive Bayes}
+            \label{fig:cm_nb}
+        \end{subfigure}\hspace{0.6cm}
+        \begin{subfigure}{0.28\textwidth}
+            \centering
+            \includegraphics[width=4.3cm]{confusion_bert.png}
+            \caption{BERT}
+            \label{fig:cm_bert}
+        \end{subfigure}\hspace{0.8cm}
+        \begin{subfigure}{0.28\textwidth}
+            \centering
+            \includegraphics[width=4cm]{distilbertFT_confusion_matrix.png}
+            \caption{DistilBERT}
+            \label{fig:cm_distilbert}
+        \end{subfigure}
+    }
+    \caption{Confusion matrix for the studied models}
+    \label{fig:confusion_all}
+\end{figure}
+
+Overall, Table~\ref{tab:baseline_results} and the confusion matrices in Fig.~\ref{fig:confusion_all} show that transformer-based models are superior to the traditional baselines in all evaluation metrics. Naive Bayes is the least performing, and logistic regression has a considerable improvement. Nevertheless, the accuracy, precision, recall, and F1-score of both BERT and DistilBERT are significantly higher, and DistilBERT is a little more accurate than BERT, though it is a smaller and faster model. These findings show that transformer architectures can learn more comprehensive textual patterns, and they can offer significantly higher spam detection rates compared to other conventional machine-learning algorithms.
+
+\paragraph{}
+All experiments in this study can be fully reproduced using the information provided in the Methodology and Experimental Results sections. We have specified the dataset, the exact preprocessing steps, and the 70/10/20 split we used for training, validation, and testing. For TF-IDF baselines, we describe the vectorizer settings, while for BERT and DistilBERT, we report the tokenizer, maximum sequence length (128), batch sizes, and all hyperparameter search ranges used by Optuna. Training was performed using the Hugging Face Trainer API with fixed random seeds to ensure deterministic runs. These details are sufficient for replicating our reported metrics and recreating the final models. The full training and evaluation code (including saved model checkpoints) is available in our project repository
+\href{https://github.com/AydaNodel/COMP6321-Term-project--Spam-email-detection/tree/main}{GitHub file}. This provides an additional reproducible path.
+
+
+
+\begin{table}[h!]
+\centering
+\caption{Performance comparison of models}
+\begin{tabular}{lcccc}
+\hline
+\textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-score} \\
+\hline
+Naive Bayes & 0.955 & 0.978 & 0.932 & 0.954 \\
+Logistic Regression & 0.982 & 0.980 & 0.984 & 0.982 \\
+BERT model & 0.9929 & 0.9940 & 0.9918 & 0.9929 \\
+DistilBERT model & 0.9931   & 0.9935   & 0.9927    & 0.9931     \\
+\hline
+\end{tabular}
+\label{tab:baseline_results}
+\end{table}
+
+
+\section{Concluding Remarks}
+%You should have a paragraph or 2 which clearly summarizes your project and the achievements. 
+
+In this project, we compared four different models for spam email detection: Naive Bayes, logistic regression, BERT, and DistilBERT. We used the same balanced dataset and the same 70/10/20 split for all experiments, so the comparison would be fair. The baseline models were trained using TF-IDF features, while the transformer models used WordPiece tokenization with a sequence length of 128. All experiments followed the preprocessing and training steps described earlier, which makes the whole pipeline reproducible.
+
+Our results show a clear difference between traditional models and transformer models. Logistic Regression performed well and outperformed Naive Bayes, but both transformer models achieved much higher accuracy. After tuning with Optuna, BERT reached 99.22\% accuracy, and DistilBERT performed slightly better at 99.31\%. Even though DistilBERT is smaller and faster, it still matched and slightly surpassed BERT, which makes it a strong choice for practical spam-filtering systems.
+
+In conclusion, this project shows why transformer models perform so well for spam detection compared to TF-IDF baselines. Naive Bayes and logistic regression mainly depend on word frequencies and maintain no word order. So, they work well when spam uses obvious keywords but struggle when the wording changes even slightly. In our experiments, this is exactly why they achieved high precision but lower recall. They missed many subtle spam messages. BERT and DistilBERT behave differently. Since they use contextual embeddings, they understand the meaning of a sentence instead of just counting words. This helps the model detect phrases that look harmless if read word-by-word. It clearly indicates spam when viewed in context. This explains the big jump in recall and F1-score for both transformer models. After tuning, BERT became more stable and achieved strong performance. DistilBERT slightly surpassed BERT because it generalizes better on our dataset while being smaller and faster to train.
+
+
+%These results make sense given how each model works. TF-IDF captures surface-level patterns. On the other hand, transformers capture relationships between words, intent, and phrasing. This is why transformer models handle modern, more sophisticated spam emails much better than traditional methods. We have provided all dataset details, preprocessing steps, tokenization settings, training parameters, and Optuna search ranges, so the experiments can be fully reproduced. 
+
+With these results, we show that modern language models—especially lightweight ones like DistilBERT—are a practical and highly effective choice for real-world spam detection.
+
+
+\paragraph{Limitations and Future Work.}
+%You should use a paragraph or 2 to clearly articulate the limitations of your work and possible ways to extend it.
+
+Although the proposed transformer models demonstrate robustness and effectiveness for spam email detection, there are a few limitations on this work, such as constraints on the dataset, context length, computational complexity, and continuous learning (i.e., adaptability to new spam patterns). First, the dependencies of the dataset may not accurately represent the complexity of real email traffic. Second, newly evolved spam patterns—such as AI-generated phishing emails, cannot be captured well enough by the current system. Finally, although Optuna tuning improves model performance through optimizing hyperparameters, the method is computationally intensive and may not generalize identically over other datasets.
+
+Therefore, future suggestions should focus on the following points; firstly, using a variety of email sources, such as Enron or Ling-Spam, to improve dataset diversity and reduce domain bias, ensuring that the model can handle different writing structures and spam patterns. Secondly, develop evolving mechanisms that can periodically update the model with newly labelled emails, which can adapt to the quickly changing nature of spam and phishing techniques. Thirdly, using more advanced Transformer Models, including RoBERTa and DeBERTa, to capture a longer context of the emails. Finally, applying adversarial robustness techniques, i.e., adversarial attacks or adversarial training, can help the system avoid complex or purposely modified spam designed to circumvent detection.
+
+
+\bibliographystyle{plainnat}\bibliography{bib}
+\newpage 
+\section*{Appendix A}
+In this section, we explain the performance of Optuna for the BERT and distilBERT models numerically and in detail. 
+
+The impact of hyperparameter tuning on the BERT model, with the use of Optuna, is presented in Fig.~\ref{bert_optuna}. The hyperparameter importance plot in Fig.~\ref{bert_importance} shows that dropout and the weight decay have the highest effect on the performance, with importance values of about 0.42 and 0.28, respectively, then the learning rate, the batch size, and the number of epochs. The contour and parallel coordinate plots in Figs.~(\ref{bert_Contour},\ref{bert_Parallel}) indicate that the best performance is in the trials with a small learning rate ($1e^{-5}$ to $3e^{-5}$), dropout values (0.30 to 0.35), weight decay (0.06 to 0.09), and a batch size of 32. The optimization history in Fig.~\ref{bert_History} also shows that the F1-score increased steadily between approximately 0.9936 and 0.9950 in eight trials, which means that Optuna was effective in searching for a good configuration.
+
+\begin{figure}[h!]
+    \centering
+    \makebox[\textwidth][c]{%
+        \begin{subfigure}{0.28\textwidth}
+            \centering
+            \includegraphics[width=5.5cm]{distilbertFT_Hyperparameter_importance.png}
+            \caption{Importance}
+        \end{subfigure}\hspace{1.5cm}
+        \begin{subfigure}{0.28\textwidth}
+            \centering
+            \includegraphics[width=5.5cm]{distilbertFT_Contour.png}
+            \caption{Contour}
+        \end{subfigure}\hspace{1.5cm}
+        \begin{subfigure}{0.28\textwidth}
+            \centering
+            \includegraphics[width=5.5cm]{distilbertFT_Optimization_history.png}
+            \caption{History}
+        \end{subfigure}\hspace{0.4cm}
+        \begin{subfigure}{0.28\textwidth}
+            \centering
+            \includegraphics[width=5.5cm]{distilbertFT_Parallel_coordinate.png}
+            \caption{Parallel}
+        \end{subfigure}\hspace{0.8cm}
+    }
+    \caption{Optuna performance for DistilBERT model}
+    \label{distil_optuna}
+\end{figure}
+
+
+As seen in Fig.~\ref{distil_optuna}, learning rate and batch size were the most impact hyperparameters, while others had smaller effects. The optimal solution was obtained at a batch size = 32 and a learning rate = $3e^{-5}$ when checking plots of parallel coordinate and contour, while the optimization history plot ensures that the model is converging. In summary, after optimizing by Optuna, the model shows its validation on accuracy and stable behavior, resulting in a significantly more effective and reliable DistilBERT model for spam detection.
+
+\begin{figure}[h!]
+    \centering
+    \makebox[\textwidth][c]{%
+        \begin{subfigure}{0.28\textwidth}
+            \centering
+            \includegraphics[width=5.2cm]{optuna_importances.png}
+            \caption{Importance}
+            \label{bert_importance}
+        \end{subfigure}\hspace{1.5cm}
+        \begin{subfigure}{0.28\textwidth}
+            \centering
+            \includegraphics[width=5.2cm]{optuna_contour.png}
+            \caption{Contour}
+            \label{bert_Contour}
+        \end{subfigure}\hspace{1.5cm}
+        \begin{subfigure}{0.28\textwidth}
+            \centering
+            \includegraphics[width=5.2cm]{optuna_history.png}
+            \caption{History}
+            \label{bert_History}
+        \end{subfigure}\hspace{0.4cm}
+        \begin{subfigure}{0.28\textwidth}
+            \centering
+            \includegraphics[width=5.2cm]{optuna_parallel.png}
+            \caption{Parallel}
+            \label{bert_Parallel}
+        \end{subfigure}\hspace{0.8cm}
+    }
+    \caption{Optuna performance for BERT model}
+    \label{bert_optuna}
+\end{figure}
+
+\input{checklist}
+
+
+
+\end{document}
+

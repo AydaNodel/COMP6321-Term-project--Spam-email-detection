@@ -1,12 +1,5 @@
 \documentclass{article}
 
-
-% if you need to pass options to natbib, use, e.g.:
-%     \PassOptionsToPackage{numbers, compress}{natbib}
-% before loading neurips_2025
-
-
-% ready for submission
 \usepackage[final]{neurips_2025}
 
 \usepackage{tikz}
@@ -137,23 +130,8 @@ where $\mathbf{w}$ is the weight vector, $\mathbf{x}$ is the feature vector, $b$
 BERT is a Transformer-based language model that uses self-attention layers to learn contextual relationships between words. BERT is bidirectional, which means that it considers both left and right context at the same time; therefore, it can capture more semantic meaning than traditional sequential models. This is very useful when dealing with text classification, which includes spam detection.
 
 We used bert-base-uncased for our transformer part of the project. It has 12 encoder layers and 12 attention heads (hidden size of 6768). We used the normal BERT tokenizer (WordPiece). It lowercases the text and then splits it into subwords. 
-%All emails were tokenized with a maximum length of 128. We then trained our model using Hugging Face Trainer API in PyTorch. For baseline fine-tuning (before optuna), we used a learning rate of $2e^{-5}$, 32 batch size, 0.01 weight decay and trained it for 2 epochs. We also used a callback function to record our training and validation loss at different steps so that we could plot curves and compare performance later. 
+
 Then, we fine-tuned the pre-trained BERT model on our tokenized dataset, adapting its learned language representations to the specific task of spam classification. The model was configured as a sequence classification task with two output labels. The pretrained BERT model is used on our dataset. After the baseline training, we used Optuna to tune BERT's hyperparameters. Once we found our best model (best combination), we trained the final BERT model again using those settings.
-
-%We loaded the tokenized dataset from disk using the Hugging Face datasets library and passed it into the Trainer.
-
-%On test set, the final tuned model reached an accuracy of 0.9922, precision of 0.9938, recall of 0.9907, and an F1-score of 0.9922. These results show that BERT performs extremely well on this spam detection task. This is mainly because it can capture contextual patterns better than a simple bag-of-words model. 
-
-%------------------ older version -----------
-%To check how well the BERT spam classifier, which has been tweaked properly, would perform with the new emails, we developed a small tool for inference based on the Hugging Face Transformers and PyTorch libraries. The tool is responsible for loading the saved BERT model along with its tokenizer from the disk, and, if available, it will automatically transfer the model to the GPU. The utility performs WordPiece tokenization with padding and truncation to a maximum sequence length of 128 and, for the provided list of raw email texts, turns the text inputs into tensors. Also, it conducts a forward pass in evaluation mode without gradient computation. The predicted class indices are acquired by taking the argmax over the model's output logits, and these indices are converted to human-readable labels ("HAM" or "SPAM"). Finally, the tool incorporates the original texts along with their predicted labels into a Pandas DataFrame, and can optionally export the results as a CSV file. The running of this evaluation script shows how quickly the BERT model can be implemented in a real-life scenario for the classification of new and unseen emails.
-
-%For our transformer-based method, we retrained the pre-trained BERT-base-uncased model specifically for the task of binary spam classification. The BERT-base-uncased model is made up of 12 transformer encoder layers, each with 768 hidden units and 12 attention heads, and its weights were initialized with those from large general-domain corpora. We used Hugging Face BertTokenizer and BertForSequenceClassification both being two output labels (spam vs. non-spam) as per our configuration. The preprocessed dataset (see Section X) was saved on the disk utilizing the Hugging Face datasets library and was accessed through load\_from\_disk. After having the dataset in PyTorch tensors format with input\_ids, attention\_mask, and labels, it was able to be consumed directly by the Trainer API.
-
-%Initially, we conducted a baseline BERT model training with a set of hyperparameters that remained unchanged: 2 epochs of training, a training batch size of 32 per device, an evaluation batch size of 64, a learning rate of 2 x 10$^{-5}$ and a weight deprecation of 0.01. The training and evaluation processes were carried out through the use of Hugging Face’s Trainer and TrainingArguments classes, where the validation split was evaluated at certain intervals. A dedicated MetricsCallback was created for the purpose of recording the training loss, the validation loss, and the validation accuracy throughout the training process. The logs were kept as CSV files and were utilized to create learning curves depicting the training and validation losses as well as the validation accuracy in terms of steps, which helped to understand the convergence behavior and the risk of overfitting.
-
-%The final BERT model was trained with the best-found learning rate, weight decay, batch size, number of epochs, and dropout, and then evaluated on the held-out test set. We computed standard classification metrics (accuracy, precision, recall, and F1-score) as well as the confusion matrix to analyze false positives and false negatives. The confusion matrix was saved both as a CSV file and as a plotted image, and additional histories such as train loss, validation loss, and validation metrics were exported as CSV files under the model directory. This end-to-end procedure—from baseline training, through Optuna-based hyperparameter tun sing, to final evaluation on the test set—constitutes our BERT-based spam classifier pipeline.
-
-%On the held-out test set, the final BERT model achieved an evaluation loss of 0.0311, accuracy of 0.9922, precision of 0.9938, recall of 0.9907, and F1-score of 0.9922, after 2 epochs of training (epoch = 2.0, eval\_loss = 0.0310536, eval\_accuracy = 0.9922476, eval\_precision = 0.9938012, eval\_recall = 0.9906727, eval\_f1 = 0.9922345). These results confirm that the tuned BERT model is highly effective for spam detection, achieving very strong performance while maintaining a stable and efficient training process.
 
 
 \subsection{DistilBERT Transformer Model}
